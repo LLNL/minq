@@ -23,10 +23,12 @@ int main(int argc, char ** argv){
       std::cerr << "Please use '" << argv[0] << " <nstates> <npoints>'" << std::endl; 
       exit(1);
     }
-
-    long nstates = atoi(argv[1]);
-    long npoints = atoi(argv[2]);
+  }
     
+  long nstates = atoi(argv[1]);
+  long npoints = atoi(argv[2]);
+
+  if(rank == 0){  
     if(nstates < 0) {
       std::cerr << "The number of states must be positive. The value received was " << nstates << std::endl; 
       exit(1);
@@ -36,13 +38,8 @@ int main(int argc, char ** argv){
       std::cerr << "The number of points must be positive. The value received was " << nstates << std::endl; 
       exit(1);
     }
-    
-    std::cout << "minq input:" << std::endl;
-    std::cout << "  nstates = " << nstates << std::endl;
-    std::cout << "  npoints = " << npoints << std::endl;
-
   }
-
+  
   int dims[2] = {0, 0};
   
   err = MPI_Dims_create(size, 2, dims);
@@ -54,7 +51,17 @@ int main(int argc, char ** argv){
   err = MPI_Cart_create(MPI_COMM_WORLD, 2, dims, periods, 1, &cart_comm);
   assert(err == 0);
 
+  if(rank == 0){
 
+    std::cout << "minq input:" << std::endl;
+    std::cout << "  total procs =  " <<  size   << std::endl;
+    std::cout << "  states procs = " << dims[0] << std::endl;
+    std::cout << "  points procs = " << dims[1] << std::endl;
+    std::cout << "  nstates  =     " << nstates << std::endl;
+    std::cout << "  npoints  =     " << npoints << std::endl;
+
+  }
+  
   
   err = MPI_Finalize();
   assert( err == 0 );
