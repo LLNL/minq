@@ -21,7 +21,7 @@ int main(int argc, char ** argv){
     exit(1);
   }
 
-  std::cout << "Minq input:" << std::endl;
+  std::cout << "minq input:" << std::endl;
   std::cout << "  nstates = " << nstates << std::endl;
   std::cout << "  npoints = " << npoints << std::endl;
 
