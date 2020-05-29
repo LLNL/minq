@@ -1,7 +1,10 @@
+#include "run.hpp"
+
 #include <iostream>
 #include <cstdlib>
 #include <cassert>
 #include <mpi.h>
+#include <complex>
 
 int main(int argc, char ** argv){
 
@@ -61,7 +64,8 @@ int main(int argc, char ** argv){
     std::cout << "  npoints  =     " << npoints << std::endl;
 
   }
-  
+
+  minq::run<std::complex<double>>(nstates, npoints, cart_comm);
   
   err = MPI_Finalize();
   assert( err == 0 );
