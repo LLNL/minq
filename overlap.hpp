@@ -1,3 +1,6 @@
+#ifndef MINQ__OVERLAP
+#define MINQ__OVERLAP
+
 #include <slate/slate.hh>
 
 namespace minq {
@@ -8,3 +11,5 @@ auto overlap(slate::Matrix<Type> & wavefunction, slate::HermitianMatrix<Type> & 
 }
 
 }
+
+#endif

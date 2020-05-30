@@ -1,3 +1,6 @@
+#ifndef MINQ__RUN
+#define MINQ__RUN
+
 #include "randomize.hpp"
 #include "orthogonalize.hpp"
 
@@ -40,3 +43,6 @@ void run(long nstates, long npoints, MPI_Comm comm){
 }
 
 }
+
+#endif
+

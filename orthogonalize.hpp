@@ -1,3 +1,6 @@
+#ifndef MINQ__ORTHOGONALIZE
+#define MINQ__ORTHOGONALIZE
+
 #include "overlap.hpp"
 
 #include <slate/slate.hh>
@@ -71,3 +74,5 @@ auto check_orthogonalization(slate::Matrix<Type>  & wavefunction){
 }
 
 }
+
+#endif

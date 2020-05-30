@@ -1,3 +1,6 @@
+#ifndef MINQ__RANDOMIZE
+#define MINQ__RANDOMIZE
+
 #include <cstdlib>
 
 namespace minq {
@@ -25,3 +28,5 @@ void randomize(MatrixType & matrix){
 
 }
 }
+
+#endif
