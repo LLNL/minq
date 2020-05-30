@@ -1,5 +1,5 @@
-#ifndef MINQ__RANDOMIZE
-#define MINQ__RANDOMIZE
+#ifndef MINQ__SUBSPACE_DIAGONALIZATION
+#define MINQ__SUBSPACE_DIAGONALIZATION
 
 /* 
 Copyright 2020 Xavier Andrade <xavier@llnl.gov>
@@ -24,36 +24,36 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <cstdlib>
+#include "overlap.hpp"
 
+#include <slate/slate.hh>
+
+#include <iostream>
 namespace minq {
-namespace aux {
 
-//Randomize the wavefunction. This is just to initialize the
-//matrix and it is not really representative of an intensive
-//operation in a DFT code.
+template <class Type>
+auto subspace_diagonalization(slate::Matrix<Type>  & hwavefunction, slate::Matrix<Type>  & wavefunction){
 
-template <class MatrixType>
-void randomize(MatrixType & matrix){
+  int nprocs[2];
+  int periods[2];
+  int coords[2];
+  
+  auto err = MPI_Cart_get(wavefunction.mpiComm(), 2, nprocs, periods, coords);
+  assert(err == 0);  
+  
+  auto nstates = wavefunction.m();
+  auto nbs = (nstates + nprocs[0] - 1)/nprocs[0];
 
-  for (long jj = 0; jj < matrix.nt(); ++jj) {
-    for (long ii = 0; ii < matrix.mt(); ++ii) {
-      if (matrix.tileIsLocal( ii, jj )) {
-        auto tile = matrix(ii, jj);
+  slate::Matrix<Type> subspace_hamiltonian(nstates, nstates, nbs, nbs, nprocs[0], nprocs[1], wavefunction.mpiComm());
+  subspace_hamiltonian.insertLocalTiles();
 
-        for(long jtile = 0; jtile < tile.nb(); jtile++){
-          for(long itile = 0; itile < tile.mb(); itile++){
-            tile.data()[itile + tile.stride()*jtile] = drand48();
-          }
-        }
-
-      }
-    }
-  }
+  auto trans = conj_transpose(hwavefunction);
+  
+  slate::gemm(Type(0.1), wavefunction, trans, Type(0.0), subspace_hamiltonian);
   
 }
 
 }
-}
+
 
 #endif

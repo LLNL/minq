@@ -26,6 +26,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "randomize.hpp"
 #include "orthogonalize.hpp"
+#include "subspace_diagonalization.hpp"
 
 #include <mpi.h>
 #include <slate/slate.hh>
@@ -52,16 +53,17 @@ void run(long nstates, long npoints, MPI_Comm comm){
   
   matrix wavefunction(nstates, npoints, nbs, nbp, nprocs[0], nprocs[1], comm);
   wavefunction.insertLocalTiles();
-
-  //Randomize the wavefunction. This is just to initialize the
-  //matrix and it is not really representative of an intensive
-  //operation in a DFT code.
   aux::randomize(wavefunction);
 
   orthogonalize(wavefunction);
 
   aux::check_orthogonalization(wavefunction);
-  
+
+  matrix hwavefunction(nstates, npoints, nbs, nbp, nprocs[0], nprocs[1], comm);
+  hwavefunction.insertLocalTiles();
+  aux::randomize(wavefunction);
+
+  subspace_diagonalization(hwavefunction, wavefunction);  
   
 }
 
