@@ -24,17 +24,33 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <slate/slate.hh>
+
 #include <cstdlib>
+#include <complex>
 
 namespace minq {
 namespace aux {
+
+template <class Type>
+Type random();
+
+template <>
+double random(){
+  return 2.0*(drand48() - 0.5);
+}
+
+template <>
+std::complex<double> random(){
+  return std::complex<double>(random<double>(), random<double>());
+}
 
 //Randomize the wavefunction. This is just to initialize the
 //matrix and it is not really representative of an intensive
 //operation in a DFT code.
 
-template <class MatrixType>
-void randomize(MatrixType & matrix){
+template <class Type>
+void randomize(slate::Matrix<Type> & matrix){
 
   for (long jj = 0; jj < matrix.nt(); ++jj) {
     for (long ii = 0; ii < matrix.mt(); ++ii) {
@@ -43,7 +59,7 @@ void randomize(MatrixType & matrix){
 
         for(long jtile = 0; jtile < tile.nb(); jtile++){
           for(long itile = 0; itile < tile.mb(); itile++){
-            tile.data()[itile + tile.stride()*jtile] = drand48();
+            tile.data()[itile + tile.stride()*jtile] = random<Type>();
           }
         }
 
