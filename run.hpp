@@ -1,4 +1,5 @@
 #include "randomize.hpp"
+#include "overlap.hpp"
 
 #include <mpi.h>
 #include <slate/slate.hh>
@@ -16,21 +17,28 @@ void run(long nstates, long npoints, MPI_Comm comm){
 
   auto err = MPI_Cart_get(comm, 2, nprocs, periods, coords);
   assert(err == 0);
-  
-  auto nbs = (nstates + 1)/nprocs[0];
-  auto nbp = (nstates + 1)/nprocs[1];
+
+  //These are the blocksizes, essentially we need one block per
+  //process because of the limitation of other operations like a 3D
+  //FFT
+  auto nbs = (nstates + nprocs[0] - 1)/nprocs[0];
+  auto nbp = (npoints + nprocs[1] - 1)/nprocs[1];
   
   matrix wavefunction(nstates, npoints, nbs, nbp, nprocs[0], nprocs[1], comm);
   wavefunction.insertLocalTiles();
-
 
   //Randomize the wavefunction. This is just to initialize the
   //matrix and it is not really representative of an intensive
   //operation in a DFT code.
   randomize(wavefunction);
 
+  slate::HermitianMatrix<Type> square(slate::Uplo::Lower, nstates, nbs, nprocs[0], nprocs[1], comm);
+  square.insertLocalTiles();
+  
+  overlap(wavefunction, square);
+
   
   
 }
 
-} 
+}
