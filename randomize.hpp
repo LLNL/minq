@@ -1,6 +1,7 @@
 #include <cstdlib>
 
 namespace minq {
+namespace aux {
 
 template <class MatrixType>
 void randomize(MatrixType & matrix){
@@ -22,4 +23,5 @@ void randomize(MatrixType & matrix){
   
 }
 
+}
 }

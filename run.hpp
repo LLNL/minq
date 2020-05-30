@@ -30,10 +30,11 @@ void run(long nstates, long npoints, MPI_Comm comm){
   //Randomize the wavefunction. This is just to initialize the
   //matrix and it is not really representative of an intensive
   //operation in a DFT code.
-  randomize(wavefunction);
+  aux::randomize(wavefunction);
 
   orthogonalize(wavefunction);
 
+  aux::check_orthogonalization(wavefunction);
   
   
 }
