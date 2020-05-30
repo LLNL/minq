@@ -1,5 +1,5 @@
 #include "randomize.hpp"
-#include "overlap.hpp"
+#include "orthogonalize.hpp"
 
 #include <mpi.h>
 #include <slate/slate.hh>
@@ -32,10 +32,7 @@ void run(long nstates, long npoints, MPI_Comm comm){
   //operation in a DFT code.
   randomize(wavefunction);
 
-  slate::HermitianMatrix<Type> square(slate::Uplo::Lower, nstates, nbs, nprocs[0], nprocs[1], comm);
-  square.insertLocalTiles();
-  
-  overlap(wavefunction, square);
+  orthogonalize(wavefunction);
 
   
   
