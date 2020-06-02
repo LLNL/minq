@@ -32,8 +32,8 @@ CXXFLAGS = -g -Ofast -fopenmp \
 	-I$(SLATEDIR)/lapackpp/include \
 	-I$(CUDADIR)/include
 
-LDFLAGS = -L$(SLATEDIR)/lib -L$(CUDADIR)/lib64/
-LIBS = -lslate -lcublas -lcudart
+LDFLAGS = -L$(CUDADIR)/lib64/
+LIBS = $(SLATEDIR)/lib/libslate.a $(SLATEDIR)/lapackpp/lib/liblapackpp.a $(SLATEDIR)/blaspp/lib/libblaspp.a -llapack -lblas -lcublas -lcudart -lgfortran
 
 minq: minq.cpp
 	$(CXX) $(CXXFLAGS) minq.cpp -o minq $(LDFLAGS) $(LIBS)

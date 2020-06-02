@@ -44,18 +44,26 @@ auto subspace_diagonalization(slate::Matrix<Type>  & hwavefunction, slate::Matri
   auto nstates = wavefunction.m();
   auto nbs = (nstates + nprocs[0] - 1)/nprocs[0];
 
-  slate::Matrix<Type> hamiltonian(nstates, nstates, nbs, nbs, nprocs[0], nprocs[1], wavefunction.mpiComm());
-  hamiltonian.insertLocalTiles();
+  slate::Matrix<Type> temp(nstates, nstates, nbs, nbs, nprocs[0], nprocs[1], wavefunction.mpiComm());
+  temp.insertLocalTiles();
 
   auto trans = conj_transpose(hwavefunction);
   
-  slate::gemm(Type(0.1), wavefunction, trans, Type(0.0), hamiltonian);
+  slate::gemm(Type(0.1), wavefunction, trans, Type(0.0), temp);
 
-  slate::HermitianMatrix<Type> hermitian_hamiltonian(slate::Uplo::Upper, hamiltonian);
+  slate::HermitianMatrix<Type> hermitian_hamiltonian(slate::Uplo::Lower, temp);
 
   std::vector<double> eigenvalues(nstates);
-  slate::heev(hermitian_hamiltonian, eigenvalues);
 
+  slate::heev(lapack::Job::Vec, hermitian_hamiltonian, eigenvalues, temp);
+
+  auto wavefunction_copy = wavefunction;
+  wavefunction_copy.insertLocalTiles();
+
+  copy(wavefunction, wavefunction_copy);
+  
+  slate::gemm(Type(1.0), temp, wavefunction_copy, Type(0.0), wavefunction);
+  
 }
 
 }
