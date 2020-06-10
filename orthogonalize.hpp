@@ -77,19 +77,31 @@ auto check_orthogonalization(slate::Matrix<Type>  & wavefunction){
 
   minq::overlap(wavefunction, overlap);
 
+  double diff = 0.0;
+  
   for (long jj = 0; jj < overlap.nt(); ++jj) {
     for (long ii = 0; ii < overlap.mt(); ++ii) {
       if (overlap.tileIsLocal( ii, jj )) {
         auto tile = overlap(ii, jj);
 
         for(long jtile = 0; jtile < tile.nb(); jtile++){
-          for(long itile = 0; itile < tile.mb(); itile++){
-            std::cout << itile << '\t' << jtile << '\t' << tile.data()[itile + tile.stride()*jtile] << std::endl;
+          for(long itile = jtile; itile < tile.mb(); itile++){
+            if(itile == jtile and ii == jj){
+              diff += fabs(tile.data()[itile + tile.stride()*jtile] - 1.0);
+            } else {
+              diff += fabs(tile.data()[itile + tile.stride()*jtile]);
+            }
           }
         }
 
       }
     }
+  }
+
+  if(diff <= 1e-10){
+    std::cout << "  Orthogonalization: [  OK  ] " << std::endl;
+  } else {
+    std::cout << "  Orthogonalization: [ FAIL ] " << std::endl;
   }
   
 }
