@@ -67,7 +67,7 @@ auto check_orthogonalization(slate::Matrix<Type>  & wavefunction){
   auto ierr = MPI_Comm_rank(wavefunction.mpiComm(), &rank);
   assert(ierr == 0);
 
-  if(rank == 0) std::cout << "Checking orthogonalization:";
+  if(rank == 0) std::cout << "Checking orthogonalization      :";
   
   int nprocs[2];
   int periods[2];
@@ -128,9 +128,9 @@ auto check_orthogonalization(slate::Matrix<Type>  & wavefunction){
   assert(err == 0);
                    
   if(diff <= 1e-10){
-    if(rank == 0) std::cout << " [  OK  ] ( diff = " << diff << ") " << std::endl;
+    if(rank == 0) std::cout << "    [   OK   ] (diff = " << diff << ") " << std::endl;
   } else {
-    if(rank == 0) std::cout << " [ FAIL ] ( diff = " << diff << ") " << std::endl;
+    if(rank == 0) std::cout << "    [  FAIL  ] (diff = " << diff << ") " << std::endl;
   }
   
 }

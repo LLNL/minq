@@ -36,6 +36,10 @@ namespace minq {
 template <class Type>
 void run(long nstates, long npoints, MPI_Comm comm){
 
+  int rank;
+  auto ierr = MPI_Comm_rank(comm, &rank);
+  assert(ierr == 0);
+  
   using matrix = slate::Matrix<Type>;
   
   int nprocs[2];
@@ -50,20 +54,42 @@ void run(long nstates, long npoints, MPI_Comm comm){
   //FFT
   auto nbs = (nstates + nprocs[0] - 1)/nprocs[0];
   auto nbp = (npoints + nprocs[1] - 1)/nprocs[1];
-  
+
+  if(rank == 0) std::cout << "Allocating wave functions       :";
+  std::cout.flush();
   matrix wavefunction(nstates, npoints, nbs, nbp, nprocs[0], nprocs[1], comm);
   wavefunction.insertLocalTiles();
-  aux::randomize(wavefunction);
+  matrix hwavefunction(nstates, npoints, nbs, nbp, nprocs[0], nprocs[1], comm);
+  hwavefunction.insertLocalTiles();
+  MPI_Barrier(comm);
+  if(rank == 0) std::cout << "    [  DONE  ]" << std::endl;
+  
+  if(rank == 0) std::cout << "Randomizing wave functions      :";
+  std::cout.flush();
+  {
+    aux::randomize(wavefunction);
+    aux::randomize(wavefunction);
+  }
+  MPI_Barrier(comm);
+  if(rank == 0) std::cout << "    [  DONE  ]" << std::endl;
 
-  orthogonalize(wavefunction);
+  if(rank == 0) std::cout << "Orthogonalizing wave functions  :";
+  std::cout.flush();
+  {
+    orthogonalize(wavefunction);
+  }
+  MPI_Barrier(comm);
+  if(rank == 0) std::cout << "    [  DONE  ]" << std::endl;
 
   aux::check_orthogonalization(wavefunction);
 
-  matrix hwavefunction(nstates, npoints, nbs, nbp, nprocs[0], nprocs[1], comm);
-  hwavefunction.insertLocalTiles();
-  aux::randomize(wavefunction);
-
-  subspace_diagonalization(hwavefunction, wavefunction);  
+  if(rank == 0) std::cout << "Subspace diagonalizations       :";
+  std::cout.flush();
+  {
+    subspace_diagonalization(hwavefunction, wavefunction);
+  }
+  MPI_Barrier(comm);
+  if(rank == 0) std::cout << "    [  DONE  ]" << std::endl;
   
 }
 

@@ -90,6 +90,7 @@ int main(int argc, char ** argv){
     std::cout << "  total procs       = " <<  size   << std::endl;
     std::cout << "  states procs      = " << dims[0] << std::endl;
     std::cout << "  points procs      = " << dims[1] << std::endl;
+    std::cout << std::endl;
 
   }
 
