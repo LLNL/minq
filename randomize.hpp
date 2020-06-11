@@ -52,18 +52,25 @@ std::complex<double> random(){
 template <class Type>
 void randomize(slate::Matrix<Type> & matrix){
 
+  int rank;
+  auto ierr = MPI_Comm_rank(matrix.mpiComm(), &rank);
+  assert(ierr == 0);
+
+  // we don't care about the quality of the number, just that they are different in every processor
+  srand48(rank);
+  
   for (long jj = 0; jj < matrix.nt(); ++jj) {
     for (long ii = 0; ii < matrix.mt(); ++ii) {
-      if (matrix.tileIsLocal( ii, jj )) {
-        auto tile = matrix(ii, jj);
+      if(not matrix.tileExists(ii, jj)) continue;
 
-        for(long jtile = 0; jtile < tile.nb(); jtile++){
-          for(long itile = 0; itile < tile.mb(); itile++){
-            tile.data()[itile + tile.stride()*jtile] = random<Type>();
-          }
+      auto tile = matrix(ii, jj);
+      
+      for(long jtile = 0; jtile < tile.nb(); jtile++){
+        for(long itile = 0; itile < tile.mb(); itile++){
+          tile.data()[itile + tile.stride()*jtile] = random<Type>();
         }
-
       }
+      
     }
   }
   
