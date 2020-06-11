@@ -56,7 +56,7 @@ void randomize(slate::Matrix<Type> & matrix){
   auto ierr = MPI_Comm_rank(matrix.mpiComm(), &rank);
   assert(ierr == 0);
 
-  // we don't care about the quality of the number, just that they are different in every processor
+  // we don't care about the quality of the numbers, just that they are different in every processor
   srand48(rank);
   
   for (long jj = 0; jj < matrix.nt(); ++jj) {
