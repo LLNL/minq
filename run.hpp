@@ -55,8 +55,10 @@ void run(long nstates, long npoints, MPI_Comm comm){
   auto nbs = (nstates + nprocs[0] - 1)/nprocs[0];
   auto nbp = (npoints + nprocs[1] - 1)/nprocs[1];
 
-  if(rank == 0) std::cout << "Allocating wave functions       :";
-  std::cout.flush();
+  if(rank == 0) {
+    std::cout << "Allocating wave functions       :";
+    std::cout.flush();
+  }
   matrix wavefunction(nstates, npoints, nbs, nbp, nprocs[0], nprocs[1], comm);
   wavefunction.insertLocalTiles();
   matrix hwavefunction(nstates, npoints, nbs, nbp, nprocs[0], nprocs[1], comm);
@@ -64,30 +66,35 @@ void run(long nstates, long npoints, MPI_Comm comm){
   MPI_Barrier(comm);
   if(rank == 0) std::cout << "    [  DONE  ]" << std::endl;
   
-  if(rank == 0) std::cout << "Randomizing wave functions      :";
-  std::cout.flush();
-  {
-    aux::randomize(wavefunction);
-    aux::randomize(wavefunction);
+  if(rank == 0) {
+    std::cout << "Randomizing wave functions      :";
+    std::cout.flush();
   }
+  
+  aux::randomize(wavefunction);
+  aux::randomize(wavefunction);
+
   MPI_Barrier(comm);
   if(rank == 0) std::cout << "    [  DONE  ]" << std::endl;
 
-  if(rank == 0) std::cout << "Orthogonalizing wave functions  :";
-  std::cout.flush();
-  {
-    orthogonalize(wavefunction);
+  if(rank == 0) {
+    std::cout << "Orthogonalizing wave functions  :";
+    std::cout.flush();
   }
+
+  orthogonalize(wavefunction);
+
   MPI_Barrier(comm);
   if(rank == 0) std::cout << "    [  DONE  ]" << std::endl;
 
   aux::check_orthogonalization(wavefunction);
 
-  if(rank == 0) std::cout << "Subspace diagonalizations       :";
-  std::cout.flush();
-  {
-    subspace_diagonalization(hwavefunction, wavefunction);
+  if(rank == 0) {
+    std::cout << "Subspace diagonalizations       :";
+    std::cout.flush();
   }
+
+  subspace_diagonalization(hwavefunction, wavefunction);
   MPI_Barrier(comm);
   if(rank == 0) std::cout << "    [  DONE  ]" << std::endl;
   

@@ -67,7 +67,10 @@ auto check_orthogonalization(slate::Matrix<Type>  & wavefunction){
   auto ierr = MPI_Comm_rank(wavefunction.mpiComm(), &rank);
   assert(ierr == 0);
 
-  if(rank == 0) std::cout << "Checking orthogonalization      :";
+  if(rank == 0) {
+    std::cout << "Checking orthogonalization      :";
+    std::cout.flush();
+  }
   
   int nprocs[2];
   int periods[2];
